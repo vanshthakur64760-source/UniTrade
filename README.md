@@ -1,16 +1,41 @@
-# React + Vite
+# UniTrade 🪙🔄
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+UniTrade is a peer-to-peer campus marketplace and barter platform designed exclusively for students at **Chitkara University**. It allows students to exchange (barter) or buy items using an indigenous campus credit system called **Uni Credits**, promoting sustainable campus living and easy peer-to-peer trade.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+- **Campus-Exclusive Marketplace:** Browse or list textbooks, electronics, and dorm essentials safely within the student community.
+- **Barter or Buy:** Directly exchange items with peers or use Uni Credits for seamless transactions.
+- **Uni Credits Wallet:** An indigenous credit system where users can top-up or earn credits by selling unused items.
+- **Clean Navigation:** Built with beginner-friendly React concepts to easily switch between the Landing Page, Marketplace, and Credits Wallet.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack & Concepts
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project is built using foundational web development and React concepts, keeping the codebase clean and easy to understand:
+
+- **Frontend Library:** React.js (functional components)
+- **State Management:** React `useState` hooks for managing navigation tabs, item lists, and user credit balances.
+- **Rendering:** Conditional rendering for seamless view switching without external routing libraries.
+- **Styling:** Custom CSS with semantic and straightforward class names.
+- **Versioning:** Git & GitHub
+
+---
+
+## 📁 Project Structure
+
+```text
+unitrade/
+│
+├── public/              # Static assets
+├── src/
+│   ├── App.jsx          # Main component housing navigation and page views
+│   ├── App.css          # Clean, modern stylesheet
+│   └── main.js          # Entry point
+│
+├── .gitignore
+├── package.json
+└── README.md

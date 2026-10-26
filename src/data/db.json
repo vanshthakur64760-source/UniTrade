@@ -1,0 +1,116 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "title": "Scientific Calculator (Casio FX-991EX)",
+      "price": 450,
+      "category": "Academics",
+      "condition": "Like New",
+      "location": "Hostel Block A",
+      "desc": "Perfect condition scientific calculator used for one semester. Essential for engineering math and exam calculations.",
+      "image": "https://images.unsplash.com/photo-1611125832047-1d7ad1e8e48d?w=500",
+      "seller": "Aarav Sharma"
+    },
+    {
+      "id": "2",
+      "title": "Engineering Physics & Math Textbooks",
+      "price": 250,
+      "category": "Academics",
+      "condition": "Good",
+      "location": "Hostel Block C",
+      "desc": "Clean pages, no annotations inside. Great foundational reference book for first-year core subjects.",
+      "image": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500",
+      "seller": "Rohan Gupta"
+    },
+    {
+      "id": "3",
+      "title": "Wireless Ergonomic Gaming Mouse",
+      "price": 600,
+      "category": "Electronics",
+      "condition": "Used",
+      "location": "Le Corbusier Block",
+      "desc": "Adjustable DPI settings, dual side buttons, smooth tracking on all surfaces. Perfect for gaming or CAD work.",
+      "image": "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500",
+      "seller": "Priya Singh"
+    },
+    {
+      "id": "4",
+      "title": "In-Ear Wired Studio Monitors (IEMs)",
+      "price": 850,
+      "category": "Electronics",
+      "condition": "Like New",
+      "location": "Hostel Block A",
+      "desc": "Crisp vocal separation, deep bass tuning, detachable 0.78mm 2-pin cable. Includes spare silicone ear tips.",
+      "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500",
+      "seller": "atharavsharma717"
+    },
+    {
+      "id": "5",
+      "title": "Electric Stainless Steel Kettle (1.5L)",
+      "price": 400,
+      "category": "Food",
+      "condition": "Good",
+      "location": "Hostel Block D",
+      "desc": "Boils water in under 3 minutes. Essential for quick morning coffee brews, tea, and late-night instant noodles.",
+      "image": "https://images.unsplash.com/photo-1544256718-3bcf237f3974?w=500",
+      "seller": "Simran Kaur"
+    },
+    {
+      "id": "6",
+      "title": "Yonex Badminton Racket & Shuttle Set",
+      "price": 900,
+      "category": "Supplies",
+      "condition": "Good",
+      "location": "Sports Complex",
+      "desc": "Lightweight aluminum-graphite frame with fresh string tension and towel grip attached. Great for evening doubles matches.",
+      "image": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=500",
+      "seller": "Ankit Verma"
+    },
+    {
+      "id": "7",
+      "title": "Over-Ear Wireless Noise Canceling Headphones",
+      "price": 1200,
+      "category": "Electronics",
+      "condition": "Like New",
+      "location": "Academic Block 3",
+      "desc": "Comfortable leather cushion pads, deep bass, long battery life. Keeps hostel background noise out during study sessions.",
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
+      "seller": "Kabir Mehra"
+    },
+    {
+      "id": "8",
+      "title": "Minimalist Wooden Desk Lamp",
+      "price": 350,
+      "category": "Supplies",
+      "condition": "Like New",
+      "location": "Hostel Block B",
+      "desc": "Warm LED bulb light with flexible arm angle. Perfect for late-night hostel study without disturbing roommates.",
+      "image": "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500",
+      "seller": "Neha Verma"
+    },
+    {
+      "id": "9",
+      "title": "Data Structures & Algorithms Course Book",
+      "price": 300,
+      "category": "Academics",
+      "condition": "Good",
+      "location": "Academic Block 2",
+      "desc": "Covers arrays, linked lists, trees, graphs, sorting, and dynamic programming with step-by-step illustrations.",
+      "image": "https://images.unsplash.com/photo-1532012197267-da84d127e765?w=500",
+      "seller": "Vikram Patel"
+    },
+    {
+      "id": "10",
+      "title": "Insulated Stainless Steel Water Bottle (1L)",
+      "price": 200,
+      "category": "Supplies",
+      "condition": "Like New",
+      "location": "Hostel Block C",
+      "desc": "Keeps water cold for up to 18 hours. Leak-proof cap, durable matte finish, easy to carry to lectures.",
+      "image": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500",
+      "seller": "Sneha Roy"
+    }
+  ],
+  "users": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}

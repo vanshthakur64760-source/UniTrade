@@ -10,7 +10,7 @@ function MarketView({ user, items, cart, setCart, showToast }) {
   const [tradeMessage, setTradeMessage] = useState("");
 
   const handleAddToCart = (item) => {
-    if (item.seller === user.name) {
+    if (item.seller === user?.name) {
       showToast("You cannot add your own item to cart!", "error");
       return;
     }
@@ -23,7 +23,7 @@ function MarketView({ user, items, cart, setCart, showToast }) {
   };
 
   const handleTrade = (item) => {
-    if (item.seller === user.name) {
+    if (item.seller === user?.name) {
       showToast("You cannot trade with yourself!", "error");
     } else {
       setTradeModalItem(item);

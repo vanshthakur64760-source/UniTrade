@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
-import { defaultItems } from "./data/items";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -13,22 +12,46 @@ import AccountView from "./components/AccountView";
 
 function App() {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("unitrade_user")) || null);
-  const [items, setItems] = useState(() => JSON.parse(localStorage.getItem("unitrade_items")) || defaultItems);
+  
+  // Items fetched from json-server backend
+  const [items, setItems] = useState([]);
+  
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem("unitrade_cart")) || []);
   const [currentView, setCurrentView] = useState(user ? "home" : "auth");
 
-  const handleSetUser = (newUser) => {
-    setUser(newUser); 
-    if (newUser) {
-      localStorage.setItem("unitrade_user", JSON.stringify(newUser)); 
-    } else {
-      localStorage.removeItem("unitrade_user"); 
-    }
+  // Toast notification state
+  const [toast, setToast] = useState({ message: "", type: "", visible: false });
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, type, visible: true });
+    setTimeout(() => {
+      setToast((prev) => ({ ...prev, visible: false }));
+    }, 3000);
   };
 
-  const handleSetItems = (newItems) => {
-    setItems(newItems);
-    localStorage.setItem("unitrade_items", JSON.stringify(newItems));
+  // Fetch items from json-server backend on component mount
+  useEffect(() => {
+    fetch("http://localhost:5000/items")
+      .then((res) => {
+        if (!res.ok) throw new Error("Server response error");
+        return res.json();
+      })
+      .then((data) => {
+        setItems(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching items from server:", err);
+        showToast("Could not load backend data. Ensure json-server is running.", "error");
+      });
+  }, []);
+
+  const handleSetUser = (newUser) => {
+    setUser(newUser);
+    if (newUser) {
+      localStorage.setItem("unitrade_user", JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem("unitrade_user");
+    }
   };
 
   const handleSetCart = (newCart) => {
@@ -38,6 +61,13 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Toast Notification Banner */}
+      {toast.visible && (
+        <div className={`toast ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
+
       {user && (
         <Navbar 
           user={user} 
@@ -52,6 +82,7 @@ function App() {
           <AuthViews 
             setUser={handleSetUser} 
             setCurrentView={setCurrentView} 
+            showToast={showToast}
           />
         )}
         {currentView === "home" && (
@@ -67,6 +98,7 @@ function App() {
             items={items} 
             cart={cart} 
             setCart={handleSetCart} 
+            showToast={showToast}
           />
         )}
         {currentView === "cart" && (
@@ -76,16 +108,18 @@ function App() {
             cart={cart} 
             setCart={handleSetCart} 
             items={items} 
-            setItems={handleSetItems} 
+            setItems={setItems} 
             setCurrentView={setCurrentView} 
+            showToast={showToast}
           />
         )}
         {currentView === "list_item" && (
           <ListNewView 
             user={user} 
             items={items} 
-            setItems={handleSetItems} 
+            setItems={setItems} 
             setCurrentView={setCurrentView} 
+            showToast={showToast}
           />
         )}
         {currentView === "wallet" && (
@@ -93,6 +127,7 @@ function App() {
             user={user} 
             setUser={handleSetUser} 
             setCurrentView={setCurrentView} 
+            showToast={showToast}
           />
         )}
       </main>

@@ -9,8 +9,16 @@ import {
 } from "lucide-react";
 import ItemCard from "./ItemCard";
 
-function HomeViews({ user, items, setCurrentView }) {
+function HomeViews({ user, items = [], setCurrentView }) {
   const recentItems = items.slice(0, 3);
+
+  // Dynamic Username Resolution Logic
+  const displayName =
+    user?.username ||
+    user?.name ||
+    (user?.email ? user.email.split("@")[0] : "Student");
+
+  const userCredits = user?.credits ?? 100;
 
   return (
     <div
@@ -72,7 +80,7 @@ function HomeViews({ user, items, setCurrentView }) {
             }}
           >
             Welcome back,{" "}
-            <span style={{ color: "var(--primary)" }}>{user?.name}</span>
+            <span style={{ color: "var(--primary)" }}>{displayName}</span>
           </h1>
           <p
             style={{
@@ -84,8 +92,7 @@ function HomeViews({ user, items, setCurrentView }) {
             }}
           >
             Trade textbooks, tech, and tutoring using Uni Credits (UC). You
-            currently have <strong>{user?.credits} UC</strong> available to
-            spend.
+            currently have <strong>{userCredits} UC</strong> available to spend.
           </p>
           <div
             style={{ display: "flex", gap: "16px", justifyContent: "center" }}
@@ -340,5 +347,4 @@ function HomeViews({ user, items, setCurrentView }) {
   );
 }
 
-// EXPORT AT THE END
 export default HomeViews;

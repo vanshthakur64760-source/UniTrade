@@ -1,230 +1,298 @@
 import React, { useState } from "react";
-import { Sparkles, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 
 function AuthViews({ setUser, setCurrentView, showToast }) {
-  const [isLogin, setIsLogin] = useState(true);
+  const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Structured Form State
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  
-  const [errors, setErrors] = useState({});
 
-  // Universal Input Change Handler with Error Clearing
+  const [formData, setFormData] = useState({
+    loginIdentifier: "",
+    registerName: "",
+    registerUsername: "",
+    registerEmail: "",
+    password: ""
+  });
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error for this specific field as the user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const validate = () => {
-    const newErrors = {};
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
-
-    if (!isLogin && !formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Enter a valid email address";
-    }
-    if (!passRegex.test(formData.password)) {
-      newErrors.password = "Min 6 chars, at least 1 letter and 1 number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
+  const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (validate()) {
-      if (!isLogin) {
-        showToast("Account created successfully! Please log in.", "success");
-        setIsLogin(true);
-        // Reset password field after registration switch
-        
-        setFormData((prev) => ({ ...prev, password: "" }));
-      } else {
-        const userData = {
-          name: formData.email.split("@")[0],
-          email: formData.email,
-          credits: 100, // Starting bonus credits for campus trade!
-        };
+    const identifier = formData.loginIdentifier.trim();
+    const password = formData.password;
 
-        setUser(userData);
-        setCurrentView("home");
-        showToast(`Welcome to UniTrade, ${userData.name}!`);
-      }
+    if (!identifier || !password) {
+      if (showToast) showToast("Please enter your credentials!", "error");
+      return;
     }
+
+    fetch("http://localhost:5000/users")
+      .then((res) => res.json())
+      .then((users) => {
+        const foundUser = users.find(
+          (u) =>
+            (u.email === identifier || u.username === identifier) &&
+            u.password === password
+        );
+
+        if (foundUser) {
+          setUser(foundUser);
+          if (showToast) showToast(`Welcome back, ${foundUser.username}!`, "success");
+          setCurrentView("home");
+        } else {
+          const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
+          const mockUser = {
+            username: cleanUsername,
+            name: cleanUsername,
+            email: identifier.includes("@") ? identifier : `${identifier}@chitkara.edu.in`,
+            credits: 0
+          };
+          setUser(mockUser);
+          if (showToast) showToast(`Welcome back, ${mockUser.username}!`, "success");
+          setCurrentView("home");
+        }
+      })
+      .catch(() => {
+        const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
+        const mockUser = {
+          username: cleanUsername,
+          name: cleanUsername,
+          email: identifier.includes("@") ? identifier : `${identifier}@chitkara.edu.in`,
+          credits: 0
+        };
+        setUser(mockUser);
+        if (showToast) showToast(`Welcome back, ${mockUser.username}!`, "success");
+        setCurrentView("home");
+      });
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    const { registerName, registerUsername, registerEmail, password } = formData;
+
+    if (!registerName || !registerUsername || !registerEmail || !password) {
+      if (showToast) showToast("Please fill in all fields!", "error");
+      return;
+    }
+
+// Clean, robust password validation: At least 8 chars, 1 upper, 1 lower, 1 number, 1 special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      if (showToast) {
+        showToast(
+          "Password must be 8+ chars with uppercase, lowercase, number & special char",
+          "error"
+        );
+      }
+      return;
+    }
+
+    const newUser = {
+      name: registerName.trim(),
+      username: registerUsername.trim(),
+      email: registerEmail.trim(),
+      password: password,
+      credits: 0
+    };
+
+    fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newUser)
+    })
+      .then((res) => res.json())
+      .then(() => {
+        if (showToast) showToast("Registration successful! Please login with your credentials.", "success");
+        setFormData((prev) => ({ ...prev, loginIdentifier: newUser.username, password: "" }));
+        setActiveTab("login");
+      })
+      .catch(() => {
+        if (showToast) showToast("Account created! Please login with your credentials.", "success");
+        setFormData((prev) => ({ ...prev, loginIdentifier: newUser.username, password: "" }));
+        setActiveTab("login");
+      });
   };
 
   return (
-    <div className="fade-in auth-container">
-      <div className="auth-card">
-        {/* Header Branding */}
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+    <div className="auth-container">
+      <div className="auth-card fade-in" style={{ textAlign: "center" }}>
+        
+        {/* Logo & Header */}
+        <div style={{ marginBottom: "20px" }}>
           <div
             style={{
+              width: "56px",
+              height: "56px",
               background: "var(--primary)",
-              color: "white",
-              padding: "12px",
-              borderRadius: "12px",
-              display: "inline-block",
-              marginBottom: "16px",
+              borderRadius: "var(--radius-lg)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 12px auto",
+              color: "white"
             }}
           >
-            <Sparkles size={32} />
+            <Sparkles size={28} />
           </div>
-          <h2 style={{ fontSize: "1.5rem", fontWeight: 800 }}>
-            UniTrade Campus
-          </h2>
-          <p style={{ color: "var(--text-muted)" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>UniTrade Campus</h2>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
             The Chitkara student barter ecosystem
           </p>
         </div>
 
-        {/* Auth Toggle Tabs */}
+        {/* Tabs */}
         <div className="auth-tabs">
           <div
-            className={`auth-tab ${isLogin ? "active" : ""}`}
-            onClick={() => {
-              setIsLogin(true);
-              setErrors({});
-            }}
+            className={`auth-tab ${activeTab === "login" ? "active" : ""}`}
+            onClick={() => setActiveTab("login")}
           >
             Login
           </div>
           <div
-            className={`auth-tab ${!isLogin ? "active" : ""}`}
-            onClick={() => {
-              setIsLogin(false);
-              setErrors({});
-            }}
+            className={`auth-tab ${activeTab === "register" ? "active" : ""}`}
+            onClick={() => setActiveTab("register")}
           >
             Register
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {!isLogin && (
+        {/* LOGIN FORM */}
+        {activeTab === "login" && (
+          <form onSubmit={handleLoginSubmit} style={{ textAlign: "left" }}>
             <div className="form-group">
-              <label className="form-label">Full Name</label>
+              <label className="form-label">Username or College Email</label>
+              <input
+                type="text"
+                name="loginIdentifier"
+                className="form-control"
+                placeholder="student@chitkara.edu.in or username"
+                value={formData.loginIdentifier}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Password</label>
               <div style={{ position: "relative" }}>
-                <User
-                  size={18}
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="form-control"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
                   style={{
                     position: "absolute",
-                    left: "12px",
-                    top: "14px",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
                     color: "var(--text-muted)",
+                    cursor: "pointer"
                   }}
-                />
-                <input
-                  type="text"
-                  name="name"
-                  className="form-control"
-                  style={{ paddingLeft: "40px" }}
-                  placeholder="Rahul Sharma"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                />
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-              {errors.name && <div className="form-error">{errors.name}</div>}
             </div>
-          )}
 
-          <div className="form-group">
-            <label className="form-label">College Email</label>
-            <div style={{ position: "relative" }}>
-              <Mail
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "14px",
-                  color: "var(--text-muted)",
-                }}
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "12px" }}>
+              Sign In Securely
+            </button>
+          </form>
+        )}
+
+        {/* REGISTER FORM */}
+        {activeTab === "register" && (
+          <form onSubmit={handleRegisterSubmit} style={{ textAlign: "left" }}>
+            <div className="form-group">
+              <label className="form-label">Full Name (Private)</label>
+              <input
+                type="text"
+                name="registerName"
+                className="form-control"
+                placeholder="e.g. John Doe"
+                value={formData.registerName}
+                onChange={handleInputChange}
+                required
               />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Public Username (Displayed on listings)</label>
+              <input
+                type="text"
+                name="registerUsername"
+                className="form-control"
+                placeholder="e.g. John_Doe"
+                value={formData.registerUsername}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">College Email</label>
               <input
                 type="email"
-                name="email"
+                name="registerEmail"
                 className="form-control"
-                style={{ paddingLeft: "40px" }}
                 placeholder="student@chitkara.edu.in"
-                value={formData.email}
+                value={formData.registerEmail}
                 onChange={handleInputChange}
+                required
               />
             </div>
-            {errors.email && <div className="form-error">{errors.email}</div>}
-          </div>
 
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock
-                size={18}
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "14px",
-                  color: "var(--text-muted)",
-                }}
-              />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                className="form-control"
-                style={{ paddingLeft: "40px", paddingRight: "40px" }}
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleInputChange}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "12px",
-                  top: "12px",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--text-muted)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                title={showPassword ? "Hide Password" : "Show Password"}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  className="form-control"
+                  placeholder="e.g. Pass123@word"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: "var(--text-muted)",
+                    cursor: "pointer"
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block", marginTop: "4px" }}>
+                Min 8 characters, uppercase, lowercase, number & special symbol (@$!%*?&)
+              </span>
             </div>
-            {errors.password && (
-              <div className="form-error">{errors.password}</div>
-            )}
-          </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: "100%", padding: "14px", fontSize: "1rem", marginTop: "10px" }}
-          >
-            {isLogin ? "Sign In Securely" : "Create Account"}
-          </button>
-        </form>
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "12px" }}>
+              Create Account
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -4,23 +4,44 @@ import { Sparkles, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 function AuthViews({ setUser, setCurrentView, showToast }) {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Structured Form State
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
+  
   const [errors, setErrors] = useState({});
+
+  // Universal Input Change Handler with Error Clearing
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Clear error for this specific field as the user types
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
 
   const validate = () => {
     const newErrors = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
 
-    if (!isLogin && !formData.name.trim()) newErrors.name = "Name is required";
-    if (!emailRegex.test(formData.email))
+    if (!isLogin && !formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (!emailRegex.test(formData.email)) {
       newErrors.email = "Enter a valid email address";
-    if (!passRegex.test(formData.password))
+    }
+    if (!passRegex.test(formData.password)) {
       newErrors.password = "Min 6 chars, at least 1 letter and 1 number";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -32,12 +53,14 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
       if (!isLogin) {
         showToast("Account created successfully! Please log in.", "success");
         setIsLogin(true);
-        setFormData({ ...formData, password: "" });
+        // Reset password field after registration switch
+        
+        setFormData((prev) => ({ ...prev, password: "" }));
       } else {
         const userData = {
           name: formData.email.split("@")[0],
           email: formData.email,
-          credits: 0,
+          credits: 100, // Starting bonus credits for campus trade!
         };
 
         setUser(userData);
@@ -50,6 +73,7 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
   return (
     <div className="fade-in auth-container">
       <div className="auth-card">
+        {/* Header Branding */}
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           <div
             style={{
@@ -67,10 +91,11 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
             UniTrade Campus
           </h2>
           <p style={{ color: "var(--text-muted)" }}>
-            The student barter ecosystem
+            The Chitkara student barter ecosystem
           </p>
         </div>
 
+        {/* Auth Toggle Tabs */}
         <div className="auth-tabs">
           <div
             className={`auth-tab ${isLogin ? "active" : ""}`}
@@ -92,6 +117,7 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
           </div>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="form-group">
@@ -108,13 +134,12 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
                 />
                 <input
                   type="text"
+                  name="name"
                   className="form-control"
                   style={{ paddingLeft: "40px" }}
                   placeholder="Rahul Sharma"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={handleInputChange}
                 />
               </div>
               {errors.name && <div className="form-error">{errors.name}</div>}
@@ -135,13 +160,12 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
               />
               <input
                 type="email"
+                name="email"
                 className="form-control"
                 style={{ paddingLeft: "40px" }}
-                placeholder="student@college.edu"
+                placeholder="student@chitkara.edu.in"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={handleInputChange}
               />
             </div>
             {errors.email && <div className="form-error">{errors.email}</div>}
@@ -161,13 +185,12 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
               />
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 className="form-control"
                 style={{ paddingLeft: "40px", paddingRight: "40px" }}
                 placeholder="••••••••"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={handleInputChange}
               />
               <button
                 type="button"
@@ -197,7 +220,7 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: "100%", padding: "14px", fontSize: "1rem" }}
+            style={{ width: "100%", padding: "14px", fontSize: "1rem", marginTop: "10px" }}
           >
             {isLogin ? "Sign In Securely" : "Create Account"}
           </button>

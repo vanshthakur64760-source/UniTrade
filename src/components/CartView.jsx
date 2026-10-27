@@ -1,44 +1,51 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { ShoppingCart, Trash2, ArrowRight, AlertCircle } from "lucide-react";
 
-function CartView({
-  user,
-  setUser,
-  cart,
-  setCart,
-  items,
-  setItems,
-  showToast,
-  setCurrentView,
-}) {
-  const totalCost = cart.reduce(
-    (sum, item) => sum + (Number(item.price) || 0),
-    0,
+function CartView({ showToast }) {
+  // Directly consume safe context states and functions
+  const { user, setUser, cart = [], setCart, items = [], setItems, setCurrentView } = useContext(AppContext);
+
+  // Safe fallbacks so it never crashes
+  const safeCart = Array.isArray(cart) ? cart : [];
+  const safeItems = Array.isArray(items) ? items : [];
+  
+  // FIX: Strictly check if credits is defined, otherwise fallback to 100. Allows 0 UC correctly!
+  const currentCredits = user?.credits !== undefined && user?.credits !== null ? Number(user.credits) : 100;
+
+  const totalCost = safeCart.reduce(
+    (sum, item) => sum + (Number(item?.price) || 0),
+    0
   );
-  const currentCredits = Number(user.credits) || 0;
 
   const hasInsufficientFunds = currentCredits < totalCost;
 
   const handleRemoveFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
-    showToast("Item removed from cart");
+    setCart(safeCart.filter((item) => item.id !== id));
+    if (showToast) showToast("Item removed from cart");
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0) return;
+    if (safeCart.length === 0) return;
 
     if (hasInsufficientFunds) {
-      showToast("Insufficient Uni Credits to complete purchase.", "error");
+      if (showToast) showToast("Insufficient Uni Credits to complete purchase.", "error");
       return;
     }
 
-    setUser({ ...user, credits: currentCredits - totalCost });
+    // Deduct credits and update user object
+    const updatedUser = {
+      ...user,
+      credits: currentCredits - totalCost
+    };
+    setUser(updatedUser);
 
-    const cartItemIds = cart.map((c) => c.id);
-    setItems(items.filter((item) => !cartItemIds.includes(item.id)));
+    // Remove purchased items from the marketplace items pool
+    const cartItemIds = safeCart.map((c) => c.id);
+    setItems(safeItems.filter((item) => !cartItemIds.includes(item.id)));
 
     setCart([]);
-    showToast("Purchase successful! Items are yours.", "success");
+    if (showToast) showToast("Purchase successful! Items are yours.", "success");
     setCurrentView("home");
   };
 
@@ -47,9 +54,9 @@ function CartView({
       className="fade-in"
       style={{ maxWidth: "800px", margin: "0 auto", width: "100%" }}
     >
-      <h2 style={{ fontSize: "1.8rem", marginBottom: "24px" }}>Your Cart</h2>
+      <h2 style={{ fontSize: "1.8rem", marginBottom: "24px", fontWeight: 800 }}>Your Cart</h2>
 
-      {cart.length === 0 ? (
+      {safeCart.length === 0 ? (
         <div
           style={{
             textAlign: "center",
@@ -84,12 +91,13 @@ function CartView({
         </div>
       ) : (
         <div>
-          {cart.map((item) => (
-            <div key={item.id} className="cart-item">
+          {safeCart.map((item) => (
+            <div key={item.id || Math.random()} className="cart-item" style={{ display: "flex", alignItems: "center", gap: "16px", padding: "16px", background: "var(--bg-card)", marginBottom: "12px", borderRadius: "12px", border: "1px solid var(--border)" }}>
               <img
-                src={item.image}
+                src={item.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop&q=80"}
                 alt={item.title}
                 className="cart-item-img"
+                style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "8px" }}
               />
               <div style={{ flex: 1 }}>
                 <h3
@@ -102,7 +110,7 @@ function CartView({
                   {item.title}
                 </h3>
                 <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                  Sold by: {item.seller}
+                  Sold by: @{item.seller || "student"}
                 </p>
               </div>
               <div
@@ -118,7 +126,7 @@ function CartView({
               </div>
               <button
                 className="btn btn-danger"
-                style={{ padding: "8px" }}
+                style={{ padding: "8px", background: "#fee2e2", color: "#dc2626", border: "none", borderRadius: "6px", cursor: "pointer" }}
                 onClick={() => handleRemoveFromCart(item.id)}
               >
                 <Trash2 size={18} />
@@ -126,7 +134,7 @@ function CartView({
             </div>
           ))}
 
-          <div className="cart-summary">
+          <div className="cart-summary" style={{ marginTop: "24px", padding: "24px", background: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <p
                 style={{
@@ -141,7 +149,6 @@ function CartView({
                 {totalCost} UC
               </h3>
 
-              {/* Dynamic UI depending on balance */}
               <p
                 style={{
                   color: hasInsufficientFunds

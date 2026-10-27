@@ -7,14 +7,23 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const dispatch = useDispatch();
 
-  // Extract states directly from Redux Store
   const user = useSelector((state) => state.app.user);
   const cart = useSelector((state) => state.app.cart);
   const currentView = useSelector((state) => state.app.currentView);
   const items = useSelector((state) => state.app.items);
 
-  // Wrap Redux dispatch calls inside context handlers
-  const handleSetUser = (newUser) => dispatch(setUser(newUser));
+  const handleSetUser = (newUser) => {
+    if (newUser) {
+      // Ensure credits is always a clean number, defaulting to 0 if null/undefined
+      if (newUser.credits === undefined || newUser.credits === null) {
+        newUser.credits = 0;
+      } else {
+        newUser.credits = Number(newUser.credits);
+      }
+    }
+    dispatch(setUser(newUser));
+  };
+
   const handleSetCart = (newCart) => dispatch(setCart(newCart));
   const handleSetCurrentView = (newView) => dispatch(setCurrentView(newView));
   const handleSetItems = (newItems) => {

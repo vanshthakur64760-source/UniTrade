@@ -111,15 +111,5 @@
       "seller": "Sneha Roy"
     }
   ],
-  "users": [
-    {
-      "name": "abn",
-      "username": "abn",
-      "email": "abn@gm",
-      "password": "Abn123@!",
-      "credits": 0,
-      "id": "kwC3ALZLKas"
-    }
-  ],
-  "$schema": "./node_modules/json-server/schema.json"
+  "users": []
 }

@@ -12,7 +12,6 @@ import ItemCard from "./ItemCard";
 function HomeViews({ user, items = [], setCurrentView }) {
   const recentItems = items.slice(0, 3);
 
-  // Dynamic Username Resolution Logic
   const displayName =
     user?.username ||
     user?.name ||

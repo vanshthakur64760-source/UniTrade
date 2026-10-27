@@ -20,7 +20,6 @@ function ListNewView({ user, setItems, setCurrentView, showToast }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle local file picking or fallback to URL input
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -43,8 +42,7 @@ function ListNewView({ user, setItems, setCurrentView, showToast }) {
 
     setLoading(true);
 
-    // Clean seller name (extract username before '@' if email is used)
-    const rawSellerName = user?.name || user?.email || "Atharav Sharma";
+    const rawSellerName = user?.name || user?.email || "John Doe";
     const cleanSellerName = rawSellerName.includes("@") 
       ? rawSellerName.split("@")[0] 
       : rawSellerName;
@@ -106,7 +104,7 @@ function ListNewView({ user, setItems, setCurrentView, showToast }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
           <div className="form-group">
-            <label className="form-label">Price (in Uni Credits / ₹) *</label>
+            <label className="form-label">Price (in Uni Credits) *</label>
             <input
               type="number"
               name="price"

@@ -1,7 +1,11 @@
-import React, { useState } from "react";
-import { User, Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
+import React, { useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
+import { Eye, EyeOff, Sparkles } from "lucide-react";
 
-function AuthViews({ setUser, setCurrentView, showToast }) {
+function AuthViews({ showToast }) {
+  // Direct state consumption from Context API
+  const { setUser, setCurrentView } = useContext(AppContext);
+
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -28,9 +32,14 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
       return;
     }
 
-    fetch("http://localhost:5000/users")
+    // AbortController to prevent hanging if json-server is not running
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200); // 1.2 seconds max wait
+
+    fetch("http://localhost:5000/users", { signal: controller.signal })
       .then((res) => res.json())
       .then((users) => {
+        clearTimeout(timeoutId);
         const foundUser = users.find(
           (u) =>
             (u.email === identifier || u.username === identifier) &&
@@ -42,6 +51,7 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
           if (showToast) showToast(`Welcome back, ${foundUser.username}!`, "success");
           setCurrentView("home");
         } else {
+          // Fallback mock user if not found in db.json
           const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
           const mockUser = {
             username: cleanUsername,
@@ -55,6 +65,8 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
         }
       })
       .catch(() => {
+        clearTimeout(timeoutId);
+        // Instant Offline Mode Fallback if json-server is offline
         const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
         const mockUser = {
           username: cleanUsername,
@@ -77,7 +89,7 @@ function AuthViews({ setUser, setCurrentView, showToast }) {
       return;
     }
 
-// Clean, robust password validation: At least 8 chars, 1 upper, 1 lower, 1 number, 1 special character
+    // Strict RegEx password validation: Min 8 chars, 1 upper, 1 lower, 1 number, 1 special character
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     if (!passwordRegex.test(password)) {

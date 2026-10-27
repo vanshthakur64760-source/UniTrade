@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import {
   ArrowRight,
   PlusCircle,
@@ -9,15 +10,18 @@ import {
 } from "lucide-react";
 import ItemCard from "./ItemCard";
 
-function HomeViews({ user, items = [], setCurrentView }) {
+function HomeViews({ showToast }) {
+  const { user, items = [], setCurrentView } = useContext(AppContext);
   const recentItems = items.slice(0, 3);
 
+  // Extract correct username or name
   const displayName =
     user?.username ||
     user?.name ||
     (user?.email ? user.email.split("@")[0] : "Student");
 
-  const userCredits = user?.credits ?? 100;
+  // Fetch live user credits from state (fallback to 100 if undefined)
+  const userCredits = user?.credits !== undefined ? Number(user.credits) : 100;
 
   return (
     <div
@@ -325,22 +329,36 @@ function HomeViews({ user, items = [], setCurrentView }) {
           </button>
         </div>
 
-        <div
-          className="item-grid"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-          }}
-        >
-          {recentItems.map((item) => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              user={user}
-              variant="home"
-              onClick={() => setCurrentView("marketplace")}
-            />
-          ))}
-        </div>
+        {recentItems.length > 0 ? (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {recentItems.map((item) => (
+              <div key={item.id} className="item-card fade-in" style={{ background: "white", padding: "16px", borderRadius: "12px", border: "1px solid var(--border)" }}>
+                <img src={item.image} alt={item.title} style={{ width: "100%", height: "160px", objectFit: "cover", borderRadius: "8px" }} />
+                <h4 style={{ marginTop: "12px", fontWeight: 700 }}>{item.title}</h4>
+                <p style={{ color: "var(--primary)", fontWeight: 800 }}>{item.price} UC</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              background: "var(--bg-card)",
+              borderRadius: "var(--radius-lg)",
+              border: "1px solid var(--border)",
+              color: "var(--text-muted)",
+            }}
+          >
+            No listings found yet. Be the first to list an item on the marketplace!
+          </div>
+        )}
       </div>
     </div>
   );

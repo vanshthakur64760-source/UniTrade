@@ -1,29 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 import { Wallet, LogOut, Plus } from "lucide-react";
 
-function AccountView({ user, setUser, setCurrentView, showToast }) {
+function AccountView({ showToast }) {
+  // Directly extract state & actions from AppContext
+  const { user, setUser, setCurrentView } = useContext(AppContext);
   const [customAmount, setCustomAmount] = useState("");
+
+  // Ensure default fallback values so UI never breaks
+  const userCredits = user?.credits !== undefined ? Number(user.credits) : 0;
+  const userName = user?.name || user?.username || "Student";
+  const userEmail = user?.email || "student@chitkara.edu.in";
+  const initialLetter = userName.charAt(0).toUpperCase();
 
   const handleTopUp = (e) => {
     e.preventDefault();
-    const amount = parseInt(customAmount);
+    const amount = parseInt(customAmount, 10);
+
     if (isNaN(amount) || amount < 50) {
-      showToast("Minimum top-up amount is 50 UC", "error");
+      if (showToast) showToast("Minimum top-up amount is 50 UC", "error");
       return;
     }
     if (amount > 100000) {
-      showToast("Maximum top-up amount is 100,000 UC", "error");
+      if (showToast) showToast("Maximum top-up amount is 100,000 UC", "error");
       return;
     }
-    setUser({ ...user, credits: user.credits + amount });
+
+    const updatedUser = {
+      ...user,
+      credits: userCredits + amount
+    };
+
+    setUser(updatedUser);
     setCustomAmount("");
-    showToast(`Successfully added ${amount} UC to your account!`, "success");
+    if (showToast) showToast(`Successfully added ${amount} UC to your account!`, "success");
   };
 
   const handleLogout = () => {
     setUser(null);
     setCurrentView("auth");
-    showToast("Logged out successfully");
+    if (showToast) showToast("Logged out successfully", "success");
   };
 
   return (
@@ -43,14 +59,13 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
       {/* Card 1: Profile Summary */}
       <div
         style={{
-          background:
-            "linear-gradient(135deg, var(--primary) 0%, #312e81 100%)",
+          background: "linear-gradient(135deg, var(--primary, #4f46e5) 0%, #312e81 100%)",
           width: "100%",
-          borderRadius: "var(--radius-lg)",
+          borderRadius: "var(--radius-lg, 16px)",
           padding: "40px 30px",
           color: "white",
           textAlign: "center",
-          boxShadow: "var(--shadow-md)",
+          boxShadow: "var(--shadow-md, 0 10px 25px rgba(0,0,0,0.1))",
         }}
       >
         <div
@@ -67,15 +82,13 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
             fontWeight: "bold",
           }}
         >
-          {user?.name?.charAt(0).toUpperCase()}
+          {initialLetter}
         </div>
-        <h2
-          style={{ fontSize: "1.6rem", fontWeight: 700, marginBottom: "4px" }}
-        >
-          {user?.name}
+        <h2 style={{ fontSize: "1.6rem", fontWeight: 700, marginBottom: "4px" }}>
+          {userName}
         </h2>
         <p style={{ fontSize: "1rem", opacity: 0.9, marginBottom: "24px" }}>
-          {user?.email}
+          {userEmail}
         </p>
 
         <div
@@ -89,19 +102,19 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
           Available Balance
         </div>
         <div style={{ fontSize: "4rem", fontWeight: 800 }}>
-          {user?.credits} <span style={{ fontSize: "1.5rem" }}>UC</span>
+          {userCredits} <span style={{ fontSize: "1.5rem" }}>UC</span>
         </div>
       </div>
 
       {/* Card 2: Top Up */}
       <div
         style={{
-          background: "var(--bg-card)",
+          background: "var(--bg-card, #ffffff)",
           width: "100%",
           padding: "30px",
-          borderRadius: "var(--radius-lg)",
-          border: "1px solid var(--border)",
-          boxShadow: "var(--shadow-sm)",
+          borderRadius: "var(--radius-lg, 16px)",
+          border: "1px solid var(--border, #e5e7eb)",
+          boxShadow: "var(--shadow-sm, 0 4px 6px rgba(0,0,0,0.05))",
         }}
       >
         <h3
@@ -114,17 +127,16 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
             gap: "8px",
           }}
         >
-          <Wallet size={20} color="var(--primary)" /> Top Up Credits
+          <Wallet size={20} color="var(--primary, #4f46e5)" /> Top Up Credits
         </h3>
         <p
           style={{
             fontSize: "0.9rem",
-            color: "var(--text-muted)",
+            color: "var(--text-muted, #6b7280)",
             marginBottom: "20px",
           }}
         >
-          Add custom Uni Credits to your wallet to purchase items from other
-          students.
+          Add custom Uni Credits to your wallet to purchase items from other students.
         </p>
 
         <form onSubmit={handleTopUp} style={{ display: "flex", gap: "12px" }}>
@@ -151,19 +163,19 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
       {/* Card 3: Danger Zone */}
       <div
         style={{
-          background: "var(--bg-card)",
+          background: "var(--bg-card, #ffffff)",
           width: "100%",
           padding: "30px",
-          borderRadius: "var(--radius-lg)",
+          borderRadius: "var(--radius-lg, 16px)",
           border: "1px solid #fca5a5",
-          boxShadow: "var(--shadow-sm)",
+          boxShadow: "var(--shadow-sm, 0 4px 6px rgba(0,0,0,0.05))",
         }}
       >
         <h3
           style={{
             fontSize: "1.2rem",
             marginBottom: "12px",
-            color: "var(--error)",
+            color: "var(--error, #ef4444)",
             fontWeight: 600,
           }}
         >
@@ -172,12 +184,11 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
         <p
           style={{
             fontSize: "0.9rem",
-            color: "var(--text-muted)",
+            color: "var(--text-muted, #6b7280)",
             marginBottom: "20px",
           }}
         >
-          Log out of your account on this device to keep your Uni Credits
-          secure.
+          Log out of your account on this device to keep your Uni Credits secure.
         </p>
 
         <button
@@ -187,6 +198,8 @@ function AccountView({ user, setUser, setCurrentView, showToast }) {
             padding: "14px",
             display: "flex",
             justifyContent: "center",
+            alignItems: "center",
+            gap: "8px",
             fontSize: "1.05rem",
           }}
           onClick={handleLogout}

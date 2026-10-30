@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React from "react";
+import { useTheme } from "../context/ThemeContext";
 import {
   Sun,
   Moon,
@@ -9,12 +9,12 @@ import {
   PlusCircle,
   User,
   Wallet,
-  Sparkles, // Star / Sparkle Icon restored
+  Sparkles,
 } from "lucide-react";
 
-function Navbar() {
-  const { theme, toggleTheme, user, cart, currentView, setCurrentView } =
-    useContext(ThemeContext);
+function Navbar({ user, cart, currentView, setCurrentView }) {
+  // Pure Theme Hook Consumption
+  const { theme, toggleTheme } = useTheme();
 
   const cartCount = Array.isArray(cart) ? cart.length : 0;
   const userCredits =
@@ -24,7 +24,6 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      {/* Restored Star/Sparkle Brand Logo */}
       <div className="navbar-brand" onClick={() => setCurrentView("home")}>
         <div
           className="btn-primary"
@@ -88,6 +87,7 @@ function Navbar() {
           <User size={16} /> Account
         </button>
 
+        {/* Theme Toggle Button using pure Theme Context */}
         <button
           onClick={toggleTheme}
           className="btn btn-ghost"

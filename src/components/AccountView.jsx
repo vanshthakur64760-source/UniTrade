@@ -1,9 +1,7 @@
-import React, { useContext, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React, { useState } from "react";
 import { Wallet, Plus, LogOut } from "lucide-react";
 
-function AccountView({ showToast }) {
-  const { user, setUser, setCurrentView } = useContext(ThemeContext);
+function AccountView({ user, setUser, setCurrentView, showToast }) {
   const [topUpAmount, setTopUpAmount] = useState("");
 
   const currentCredits =
@@ -19,14 +17,16 @@ function AccountView({ showToast }) {
       return;
     }
 
-    setUser({ ...user, credits: currentCredits + amount });
+    if (setUser && user) {
+      setUser({ ...user, credits: currentCredits + amount });
+    }
     setTopUpAmount("");
     if (showToast) showToast(`Added ${amount} UC to your account!`, "success");
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setCurrentView("auth");
+    if (setUser) setUser(null);
+    if (setCurrentView) setCurrentView("auth");
     if (showToast) showToast("Logged out successfully");
   };
 
@@ -59,10 +59,10 @@ function AccountView({ showToast }) {
           </div>
           <div>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-              {user?.username || "Atharav Sharma"}
+              {user?.username || user?.name || "Student"}
             </h3>
             <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
-              {user?.email || "atharav@chitkara.edu.in"}
+              {user?.email || "student@chitkara.edu.in"}
             </p>
           </div>
         </div>

@@ -16,8 +16,7 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 }
 
-/* --- Dark Theme Overrides --- */
-.app-container.dark {
+[data-theme="dark"] {
   --primary: #6366f1;
   --primary-hover: #4f46e5;
   --primary-light: rgba(99, 102, 241, 0.15);
@@ -31,25 +30,18 @@
   --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.5);
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+body, html {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
 }
 
 .app-container {
@@ -58,9 +50,7 @@ body {
   flex-direction: column;
   background-color: var(--bg-main);
   color: var(--text-main);
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Navbar */
@@ -69,18 +59,14 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 14px 5%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 50;
-  transition: all 0.3s ease;
-}
-
-.app-container.dark .navbar {
-  background-color: rgba(15, 23, 42, 0.8);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .navbar-brand {
@@ -150,12 +136,12 @@ body {
   background: #fecaca;
 }
 
-.app-container.dark .btn-danger {
+[data-theme="dark"] .btn-danger {
   color: #fca5a5;
   background: rgba(239, 68, 68, 0.2);
 }
 
-/* Badges */
+/* Badges & Tags */
 .credit-badge {
   display: flex;
   align-items: center;
@@ -175,7 +161,7 @@ body {
   transform: scale(1.03);
 }
 
-.app-container.dark .credit-badge {
+[data-theme="dark"] .credit-badge {
   background-color: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border-color: rgba(245, 158, 11, 0.3);
@@ -195,7 +181,7 @@ body {
   color: #475569;
 }
 
-.app-container.dark .tag-category {
+[data-theme="dark"] .tag-category {
   background-color: #334155;
   color: #cbd5e1;
 }
@@ -205,7 +191,7 @@ body {
   color: #0369a1;
 }
 
-.app-container.dark .tag-condition {
+[data-theme="dark"] .tag-condition {
   background-color: rgba(14, 165, 233, 0.2);
   color: #38bdf8;
 }
@@ -218,7 +204,7 @@ body {
   flex: 1;
 }
 
-/* Auth Forms */
+/* Auth */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -234,9 +220,7 @@ body {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .auth-tabs {
@@ -261,6 +245,7 @@ body {
   margin-bottom: -2px;
 }
 
+/* Forms */
 .form-group {
   margin-bottom: 18px;
 }
@@ -291,7 +276,7 @@ body {
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-/* Marketplace Cards */
+/* Marketplace Items */
 .item-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -306,10 +291,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    background-color 0.3s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease;
 }
 
 .item-card:hover {
@@ -365,7 +347,7 @@ body {
   border-top: 1px solid var(--border);
 }
 
-/* Modal Overlay */
+/* Modals */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -416,66 +398,6 @@ body {
   border-color: #fca5a5;
 }
 
-/* Utilities & Toast */
-.fade-in {
-  animation: fadeIn 0.35s ease forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.toast-container {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 100;
-}
-
-.toast {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-card);
-  color: var(--text-main);
-  padding: 14px 18px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-  font-weight: 600;
-  font-size: 0.9rem;
-  animation: slideIn 0.3s ease forwards;
-}
-
-.toast-success {
-  border-left: 4px solid var(--success);
-}
-
-.toast-error {
-  border-left: 4px solid var(--error);
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
 /* Cart */
 .cart-badge {
   position: absolute;
@@ -506,11 +428,6 @@ body {
   transition: all 0.2s;
 }
 
-.cart-item:hover {
-  box-shadow: var(--shadow-sm);
-  border-color: var(--primary-light);
-}
-
 .cart-item-img {
   width: 72px;
   height: 72px;
@@ -530,38 +447,19 @@ body {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
-/* --- Force Theme Overrides --- */
-.app-container.dark {
-  --bg-main: #0f172a !important;
-  --bg-card: #1e293b !important;
-  --text-main: #f8fafc !important;
-  --text-muted: #94a3b8 !important;
-  --border: #334155 !important;
-  background-color: var(--bg-main) !important;
-  color: var(--text-main) !important;
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.35s ease forwards;
 }
 
-.app-container.dark body,
-.app-container.dark html {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-}
-
-.app-container.dark .auth-card,
-.app-container.dark .item-card,
-.app-container.dark .modal-content,
-.app-container.dark .toolbar,
-.app-container.dark .cart-item,
-.app-container.dark .cart-summary {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border) !important;
-  color: var(--text-main) !important;
-}
-
-.app-container.dark .form-control,
-.app-container.dark .search-input,
-.app-container.dark .filter-select {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border-color: var(--border) !important;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

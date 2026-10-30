@@ -1,18 +1,7 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React from "react";
 import { ShoppingCart, Trash2, ArrowRight, AlertCircle } from "lucide-react";
 
-function CartView({ showToast }) {
-  const {
-    user,
-    setUser,
-    cart = [],
-    setCart,
-    items = [],
-    setItems,
-    setCurrentView,
-  } = useContext(ThemeContext);
-
+function CartView({ user, setUser, cart = [], setCart, items = [], setItems, setCurrentView, showToast }) {
   const safeCart = Array.isArray(cart) ? cart : [];
   const safeItems = Array.isArray(items) ? items : [];
   const currentCredits =
@@ -27,7 +16,9 @@ function CartView({ showToast }) {
   const hasInsufficientFunds = currentCredits < totalCost;
 
   const handleRemoveFromCart = (id) => {
-    setCart(safeCart.filter((item) => item.id !== id));
+    if (setCart) {
+      setCart(safeCart.filter((item) => item.id !== id));
+    }
     if (showToast) showToast("Item removed from cart");
   };
 
@@ -39,13 +30,23 @@ function CartView({ showToast }) {
       return;
     }
 
-    setUser({ ...user, credits: currentCredits - totalCost });
+    if (setUser && user) {
+      setUser({ ...user, credits: currentCredits - totalCost });
+    }
+    
     const cartItemIds = safeCart.map((c) => c.id);
-    setItems(safeItems.filter((item) => !cartItemIds.includes(item.id)));
-    setCart([]);
+    if (setItems) {
+      setItems(safeItems.filter((item) => !cartItemIds.includes(item.id)));
+    }
+    if (setCart) {
+      setCart([]);
+    }
+
     if (showToast)
       showToast("Purchase successful! Items are yours.", "success");
-    setCurrentView("home");
+    if (setCurrentView) {
+      setCurrentView("home");
+    }
   };
 
   return (
@@ -79,7 +80,7 @@ function CartView({ showToast }) {
           </p>
           <button
             className="btn btn-primary"
-            onClick={() => setCurrentView("marketplace")}
+            onClick={() => setCurrentView && setCurrentView("marketplace")}
           >
             Browse Marketplace
           </button>

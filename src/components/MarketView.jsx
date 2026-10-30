@@ -1,9 +1,7 @@
-import React, { useEffect, useContext, useState } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React, { useEffect, useState } from "react";
 import { ShoppingCart, MapPin, MessageSquare, X, Send } from "lucide-react";
 
-function MarketView({ showToast }) {
-  const { items, setItems, cart, setCart, user } = useContext(ThemeContext);
+function MarketView({ items, setItems, cart, setCart, user, showToast }) {
   const [selectedItemForTrade, setSelectedItemForTrade] = useState(null);
   const [tradeMessage, setTradeMessage] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
@@ -12,10 +10,10 @@ function MarketView({ showToast }) {
     fetch("http://localhost:5000/items")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) setItems(data);
+        if (Array.isArray(data) && data.length > 0 && setItems) setItems(data);
       })
       .catch(() => {
-        if (!items || items.length === 0) {
+        if ((!items || items.length === 0) && setItems) {
           setItems([
             {
               id: 1,
@@ -40,7 +38,7 @@ function MarketView({ showToast }) {
       if (showToast) showToast("Item is already in your cart!", "error");
       return;
     }
-    setCart([...safeCart, item]);
+    if (setCart) setCart([...safeCart, item]);
     if (showToast) showToast(`Added "${item.title}" to cart!`, "success");
   };
 
@@ -98,7 +96,7 @@ function MarketView({ showToast }) {
               <h3 className="item-title">{item.title}</h3>
               <p className="item-desc">{item.description}</p>
               <div className="item-location">
-                <MapPin size={14} /> {item.location} • @
+                <MapPin size={14} /> {item.location} @
                 {item.seller || "student"}
               </div>
               <div className="item-footer">

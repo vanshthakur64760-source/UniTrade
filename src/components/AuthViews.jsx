@@ -1,11 +1,10 @@
-import React, { useState, useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React, { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 import { Eye, EyeOff, Sparkles, Sun, Moon } from "lucide-react";
 
-function AuthViews({ showToast }) {
-  // Direct state consumption from ThemeContext
-  const { setUser, setCurrentView, theme, toggleTheme } =
-    useContext(ThemeContext);
+function AuthViews({ setUser, setCurrentView, showToast }) {
+  // Pure Theme Hook Consumption (Single Responsibility)
+  const { theme, toggleTheme } = useTheme();
 
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);

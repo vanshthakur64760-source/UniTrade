@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React from "react";
 import { ArrowRight, PlusCircle, Tag, Handshake, Lock } from "lucide-react";
 
-function HomeViews() {
-  const { user, setCurrentView } = useContext(ThemeContext);
-  const displayName = user?.username || user?.name || "Student";
+function HomeViews({ user, setCurrentView }) {
+  // Extract name robustly from user object
+  const displayName = user?.username || user?.name || (user?.email ? user.email.split("@")[0] : "Student");
   const userCredits =
     user?.credits !== undefined && user?.credits !== null
       ? Number(user.credits)
@@ -37,13 +36,13 @@ function HomeViews() {
         <div style={{ display: "flex", gap: "16px", justifyContent: "center" }}>
           <button
             className="btn btn-primary"
-            onClick={() => setCurrentView("marketplace")}
+            onClick={() => setCurrentView && setCurrentView("marketplace")}
           >
             Explore Market <ArrowRight size={18} />
           </button>
           <button
             className="btn btn-ghost"
-            onClick={() => setCurrentView("list_item")}
+            onClick={() => setCurrentView && setCurrentView("list_item")}
           >
             <PlusCircle size={18} /> List an Item
           </button>
@@ -103,5 +102,9 @@ function HomeViews() {
     </div>
   );
 }
+
+HomeViews.defaultProps = {
+  user: null,
+};
 
 export default HomeViews;

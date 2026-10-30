@@ -1,10 +1,7 @@
-import React, { useState, useContext } from "react";
-import { ThemeContext } from "../context/ThemeContext";
+import React, { useState } from "react";
 import { Upload } from "lucide-react";
 
-function ListNewView({ showToast }) {
-  const { user, items, setItems, setCurrentView } = useContext(ThemeContext);
-
+function ListNewView({ user, items, setItems, setCurrentView, showToast }) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -96,25 +93,29 @@ function ListNewView({ showToast }) {
         return res.json();
       })
       .then((savedItem) => {
-        setItems((prevItems) => [
-          savedItem,
-          ...(Array.isArray(prevItems) ? prevItems : []),
-        ]);
+        if (setItems) {
+          setItems((prevItems) => [
+            savedItem,
+            ...(Array.isArray(prevItems) ? prevItems : []),
+          ]);
+        }
         if (showToast)
           showToast("Item listed successfully in Marketplace!", "success");
-        setCurrentView("marketplace");
+        if (setCurrentView) setCurrentView("marketplace");
       })
       .catch(() => {
         clearTimeout(timeoutId);
         // Fallback for offline or json-server down scenario
         const localItem = { ...newItem, id: Date.now() };
-        setItems((prevItems) => [
-          localItem,
-          ...(Array.isArray(prevItems) ? prevItems : []),
-        ]);
+        if (setItems) {
+          setItems((prevItems) => [
+            localItem,
+            ...(Array.isArray(prevItems) ? prevItems : []),
+          ]);
+        }
         if (showToast)
           showToast("Item listed successfully! (Local Session)", "success");
-        setCurrentView("marketplace");
+        if (setCurrentView) setCurrentView("marketplace");
       });
   };
 

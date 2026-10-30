@@ -1,7 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
-import { AppContext, AppProvider } from "./context/AppContext";
+import { ThemeContext, ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import AuthViews from "./components/AuthViews";
 import HomeViews from "./components/HomeViews";
@@ -11,7 +9,7 @@ import ListNewView from "./components/ListNewView";
 import AccountView from "./components/AccountView";
 
 function MainContent() {
-  const { currentView, user } = useContext(AppContext);
+  const { currentView, user, theme } = useContext(ThemeContext);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = "success") => {
@@ -20,17 +18,15 @@ function MainContent() {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${theme}`}>
       {user && <Navbar />}
 
+      {/* Global Toast Notification */}
       {toast && (
-        <div className={`toast toast-${toast.type} fade-in`} style={{
-          position: "fixed", bottom: "20px", right: "20px", zIndex: 1000,
-          background: toast.type === "error" ? "#ef4444" : "#10b981",
-          color: "white", padding: "12px 20px", borderRadius: "8px", fontWeight: 600,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
-        }}>
-          {toast.message}
+        <div className="toast-container">
+          <div className={`toast toast-${toast.type} fade-in`}>
+            <span>{toast.message}</span>
+          </div>
         </div>
       )}
 
@@ -48,10 +44,8 @@ function MainContent() {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <AppProvider>
-        <MainContent />
-      </AppProvider>
-    </Provider>
+    <ThemeProvider>
+      <MainContent />
+    </ThemeProvider>
   );
 }

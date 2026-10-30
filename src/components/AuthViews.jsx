@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
-import { AppContext } from "../context/AppContext";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { ThemeContext } from "../context/ThemeContext";
+import { Eye, EyeOff, Sparkles, Sun, Moon } from "lucide-react";
 
 function AuthViews({ showToast }) {
-  // Direct state consumption from Context API
-  const { setUser, setCurrentView } = useContext(AppContext);
+  // Direct state consumption from ThemeContext
+  const { setUser, setCurrentView, theme, toggleTheme } =
+    useContext(ThemeContext);
 
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -14,7 +15,7 @@ function AuthViews({ showToast }) {
     registerName: "",
     registerUsername: "",
     registerEmail: "",
-    password: ""
+    password: "",
   });
 
   const handleInputChange = (e) => {
@@ -32,9 +33,9 @@ function AuthViews({ showToast }) {
       return;
     }
 
-    // AbortController to prevent hanging if json-server is not running
+    // AbortController to prevent hanging if server is down
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200); // 1.2 seconds max wait
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
 
     fetch("http://localhost:5000/users", { signal: controller.signal })
       .then((res) => res.json())
@@ -43,46 +44,58 @@ function AuthViews({ showToast }) {
         const foundUser = users.find(
           (u) =>
             (u.email === identifier || u.username === identifier) &&
-            u.password === password
+            u.password === password,
         );
 
         if (foundUser) {
           setUser(foundUser);
-          if (showToast) showToast(`Welcome back, ${foundUser.username}!`, "success");
+          if (showToast)
+            showToast(`Welcome back, ${foundUser.username}!`, "success");
           setCurrentView("home");
         } else {
           // Fallback mock user if not found in db.json
-          const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
+          const cleanUsername = identifier.includes("@")
+            ? identifier.split("@")[0]
+            : identifier;
           const mockUser = {
-            username: cleanUsername,
-            name: cleanUsername,
-            email: identifier.includes("@") ? identifier : `${identifier}@chitkara.edu.in`,
-            credits: 0
+            username: cleanUsername || "john_doe",
+            name: cleanUsername || "John Doe",
+            email: identifier.includes("@")
+              ? identifier
+              : `${identifier || "john"}@chitkara.edu.in`,
+            credits: 100,
           };
           setUser(mockUser);
-          if (showToast) showToast(`Welcome back, ${mockUser.username}!`, "success");
+          if (showToast)
+            showToast(`Welcome back, ${mockUser.username}!`, "success");
           setCurrentView("home");
         }
       })
       .catch(() => {
         clearTimeout(timeoutId);
-        // Instant Offline Mode Fallback if json-server is offline
-        const cleanUsername = identifier.includes("@") ? identifier.split("@")[0] : identifier;
+        // Instant Offline Mode Fallback
+        const cleanUsername = identifier.includes("@")
+          ? identifier.split("@")[0]
+          : identifier;
         const mockUser = {
-          username: cleanUsername,
-          name: cleanUsername,
-          email: identifier.includes("@") ? identifier : `${identifier}@chitkara.edu.in`,
-          credits: 0
+          username: cleanUsername || "john_doe",
+          name: cleanUsername || "John Doe",
+          email: identifier.includes("@")
+            ? identifier
+            : `${identifier || "john"}@chitkara.edu.in`,
+          credits: 100,
         };
         setUser(mockUser);
-        if (showToast) showToast(`Welcome back, ${mockUser.username}!`, "success");
+        if (showToast)
+          showToast(`Welcome back, ${mockUser.username}!`, "success");
         setCurrentView("home");
       });
   };
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    const { registerName, registerUsername, registerEmail, password } = formData;
+    const { registerName, registerUsername, registerEmail, password } =
+      formData;
 
     if (!registerName || !registerUsername || !registerEmail || !password) {
       if (showToast) showToast("Please fill in all fields!", "error");
@@ -96,7 +109,7 @@ function AuthViews({ showToast }) {
       if (showToast) {
         showToast(
           "Password must be 8+ chars with uppercase, lowercase, number & special char",
-          "error"
+          "error",
         );
       }
       return;
@@ -107,33 +120,68 @@ function AuthViews({ showToast }) {
       username: registerUsername.trim(),
       email: registerEmail.trim(),
       password: password,
-      credits: 0
+      credits: 100,
     };
 
     fetch("http://localhost:5000/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newUser)
+      body: JSON.stringify(newUser),
     })
       .then((res) => res.json())
       .then(() => {
-        if (showToast) showToast("Registration successful! Please login with your credentials.", "success");
-        setFormData((prev) => ({ ...prev, loginIdentifier: newUser.username, password: "" }));
+        if (showToast)
+          showToast(
+            "Registration successful! Please login with your credentials.",
+            "success",
+          );
+        setFormData((prev) => ({
+          ...prev,
+          loginIdentifier: newUser.username,
+          password: "",
+        }));
         setActiveTab("login");
       })
       .catch(() => {
-        if (showToast) showToast("Account created! Please login with your credentials.", "success");
-        setFormData((prev) => ({ ...prev, loginIdentifier: newUser.username, password: "" }));
+        if (showToast)
+          showToast(
+            "Account created! Please login with your credentials.",
+            "success",
+          );
+        setFormData((prev) => ({
+          ...prev,
+          loginIdentifier: newUser.username,
+          password: "",
+        }));
         setActiveTab("login");
       });
   };
 
   return (
     <div className="auth-container">
-      <div className="auth-card fade-in" style={{ textAlign: "center" }}>
-        
+      <div
+        className="auth-card fade-in"
+        style={{ position: "relative", textAlign: "center" }}
+      >
+        {/* Top-Right Theme Switcher Button */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="btn btn-ghost"
+          title="Toggle Theme"
+          style={{
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            padding: "8px",
+            borderRadius: "50%",
+          }}
+        >
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
         {/* Logo & Header */}
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: "20px", marginTop: "8px" }}>
           <div
             style={{
               width: "56px",
@@ -144,12 +192,14 @@ function AuthViews({ showToast }) {
               alignItems: "center",
               justifyContent: "center",
               margin: "0 auto 12px auto",
-              color: "white"
+              color: "white",
             }}
           >
             <Sparkles size={28} />
           </div>
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>UniTrade Campus</h2>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 800 }}>
+            UniTrade Campus
+          </h2>
           <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>
             The Chitkara student barter ecosystem
           </p>
@@ -210,7 +260,7 @@ function AuthViews({ showToast }) {
                     background: "none",
                     border: "none",
                     color: "var(--text-muted)",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -218,7 +268,11 @@ function AuthViews({ showToast }) {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "12px" }}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: "100%", padding: "12px" }}
+            >
               Sign In Securely
             </button>
           </form>
@@ -241,12 +295,14 @@ function AuthViews({ showToast }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Public Username (Displayed on listings)</label>
+              <label className="form-label">
+                Public Username (Displayed on listings)
+              </label>
               <input
                 type="text"
                 name="registerUsername"
                 className="form-control"
-                placeholder="e.g. John_Doe"
+                placeholder="e.g. john_doe"
                 value={formData.registerUsername}
                 onChange={handleInputChange}
                 required
@@ -289,18 +345,30 @@ function AuthViews({ showToast }) {
                     background: "none",
                     border: "none",
                     color: "var(--text-muted)",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block", marginTop: "4px" }}>
-                Min 8 characters, uppercase, lowercase, number & special symbol (@$!%*?&)
+              <span
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--text-muted)",
+                  display: "block",
+                  marginTop: "4px",
+                }}
+              >
+                Min 8 characters, uppercase, lowercase, number & special symbol
+                (@$!%*?&)
               </span>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "12px" }}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              style={{ width: "100%", padding: "12px" }}
+            >
               Create Account
             </button>
           </form>

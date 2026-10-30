@@ -1,9 +1,9 @@
 import React, { useState, useContext } from "react";
-import { AppContext } from "../context/AppContext";
+import { ThemeContext } from "../context/ThemeContext";
 import { Upload } from "lucide-react";
 
 function ListNewView({ showToast }) {
-  const { user, items, setItems, setCurrentView } = useContext(AppContext);
+  const { user, items, setItems, setCurrentView } = useContext(ThemeContext);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -12,7 +12,7 @@ function ListNewView({ showToast }) {
     category: "Books",
     condition: "Like New",
     location: "Campus Hostel",
-    image: ""
+    image: "",
   });
 
   const handleInputChange = (e) => {
@@ -71,8 +71,10 @@ function ListNewView({ showToast }) {
       category: formData.category,
       condition: formData.condition,
       location: formData.location.trim(),
-      image: formData.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop&q=80",
-      seller: user?.username || "student_user"
+      image:
+        formData.image ||
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&auto=format&fit=crop&q=80",
+      seller: user?.username || user?.name || "student_user",
     };
 
     // Controller with 1.5s timeout for fast fallback
@@ -81,12 +83,12 @@ function ListNewView({ showToast }) {
 
     fetch("http://localhost:5000/items", {
       method: "POST",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        Accept: "application/json",
       },
       body: JSON.stringify(newItem),
-      signal: controller.signal
+      signal: controller.signal,
     })
       .then((res) => {
         clearTimeout(timeoutId);
@@ -94,16 +96,24 @@ function ListNewView({ showToast }) {
         return res.json();
       })
       .then((savedItem) => {
-        setItems((prevItems) => [savedItem, ...prevItems]);
-        if (showToast) showToast("Item listed successfully in Marketplace!", "success");
+        setItems((prevItems) => [
+          savedItem,
+          ...(Array.isArray(prevItems) ? prevItems : []),
+        ]);
+        if (showToast)
+          showToast("Item listed successfully in Marketplace!", "success");
         setCurrentView("marketplace");
       })
       .catch(() => {
         clearTimeout(timeoutId);
         // Fallback for offline or json-server down scenario
         const localItem = { ...newItem, id: Date.now() };
-        setItems((prevItems) => [localItem, ...prevItems]);
-        if (showToast) showToast("Item listed successfully! (Local Session)", "success");
+        setItems((prevItems) => [
+          localItem,
+          ...(Array.isArray(prevItems) ? prevItems : []),
+        ]);
+        if (showToast)
+          showToast("Item listed successfully! (Local Session)", "success");
         setCurrentView("marketplace");
       });
   };
@@ -111,9 +121,20 @@ function ListNewView({ showToast }) {
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <div className="auth-card fade-in" style={{ maxWidth: "100%" }}>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "8px" }}>List a New Item</h2>
-        <p style={{ color: "var(--text-muted)", marginBottom: "24px", fontSize: "0.9rem" }}>
-          Share resources or trade items with fellow students for Uni Credits (UC)
+        <h2
+          style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "8px" }}
+        >
+          List a New Item
+        </h2>
+        <p
+          style={{
+            color: "var(--text-muted)",
+            marginBottom: "24px",
+            fontSize: "0.9rem",
+          }}
+        >
+          Share resources or trade items with fellow students for Uni Credits
+          (UC)
         </p>
 
         <form onSubmit={handleSubmit} style={{ textAlign: "left" }}>
@@ -145,7 +166,9 @@ function ListNewView({ showToast }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Upload Image from Device (Auto-compressed)</label>
+            <label className="form-label">
+              Upload Image from Device (Auto-compressed)
+            </label>
             <input
               type="file"
               accept="image/*"
@@ -154,13 +177,26 @@ function ListNewView({ showToast }) {
               style={{ padding: "8px" }}
             />
             {formData.image && (
-              <div style={{ marginTop: "8px", fontSize: "0.8rem", color: "var(--primary)", fontWeight: 600 }}>
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontSize: "0.8rem",
+                  color: "var(--primary)",
+                  fontWeight: 600,
+                }}
+              >
                 ✓ Image compressed and ready!
               </div>
             )}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+            }}
+          >
             <div className="form-group">
               <label className="form-label">Price (in Uni Credits - UC)</label>
               <input
@@ -176,7 +212,12 @@ function ListNewView({ showToast }) {
 
             <div className="form-group">
               <label className="form-label">Category</label>
-              <select name="category" className="form-control" value={formData.category} onChange={handleInputChange}>
+              <select
+                name="category"
+                className="form-control"
+                value={formData.category}
+                onChange={handleInputChange}
+              >
                 <option value="Books">Books & Notes</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Sports">Sports Equipment</option>
@@ -185,10 +226,21 @@ function ListNewView({ showToast }) {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+            }}
+          >
             <div className="form-group">
               <label className="form-label">Condition</label>
-              <select name="condition" className="form-control" value={formData.condition} onChange={handleInputChange}>
+              <select
+                name="condition"
+                className="form-control"
+                value={formData.condition}
+                onChange={handleInputChange}
+              >
                 <option value="Brand New">Brand New</option>
                 <option value="Like New">Like New</option>
                 <option value="Good">Good</option>
@@ -210,7 +262,11 @@ function ListNewView({ showToast }) {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "12px", marginTop: "12px" }}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%", padding: "12px", marginTop: "12px" }}
+          >
             <Upload size={18} /> Publish to Marketplace
           </button>
         </form>

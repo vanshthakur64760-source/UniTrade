@@ -1,43 +1,102 @@
 import React, { useContext } from "react";
-import { AppContext } from "../context/AppContext";
-import { Sparkles, Wallet, Home, ShoppingBag, ShoppingCart, PlusCircle, User } from "lucide-react";
+import { ThemeContext } from "../context/ThemeContext";
+import {
+  Sun,
+  Moon,
+  Home,
+  Store,
+  ShoppingCart,
+  PlusCircle,
+  User,
+  Wallet,
+  Sparkles, // Star / Sparkle Icon restored
+} from "lucide-react";
 
 function Navbar() {
-  const { user, currentView, setCurrentView, cart } = useContext(AppContext);
+  const { theme, toggleTheme, user, cart, currentView, setCurrentView } =
+    useContext(ThemeContext);
 
-  if (!user) return null;
+  const cartCount = Array.isArray(cart) ? cart.length : 0;
+  const userCredits =
+    user?.credits !== undefined && user?.credits !== null
+      ? Number(user.credits)
+      : 100;
 
   return (
-    <header className="navbar">
+    <nav className="navbar">
+      {/* Restored Star/Sparkle Brand Logo */}
       <div className="navbar-brand" onClick={() => setCurrentView("home")}>
-        <div style={{ background: "var(--primary)", color: "white", padding: "6px", borderRadius: "8px", display: "flex" }}>
+        <div
+          className="btn-primary"
+          style={{
+            padding: "8px",
+            borderRadius: "var(--radius-md)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Sparkles size={20} />
         </div>
-        UniTrade
+        <span>UniTrade</span>
       </div>
 
       <div className="navbar-links">
-        <div className="credit-badge">
-          <Wallet size={16} /> {user.credits} UC
+        <div
+          className="credit-badge"
+          onClick={() => setCurrentView("wallet")}
+          style={{ cursor: "pointer" }}
+        >
+          <Wallet size={16} />
+          <span>{userCredits} UC</span>
         </div>
-        <button className={`btn btn-ghost ${currentView === "home" ? "active" : ""}`} onClick={() => setCurrentView("home")}>
-          <Home size={18} /> Home
+
+        <button
+          className={`btn ${currentView === "home" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setCurrentView("home")}
+        >
+          <Home size={16} /> Home
         </button>
-        <button className={`btn btn-ghost ${currentView === "marketplace" ? "active" : ""}`} onClick={() => setCurrentView("marketplace")}>
-          <ShoppingBag size={18} /> Market
+
+        <button
+          className={`btn ${currentView === "marketplace" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setCurrentView("marketplace")}
+        >
+          <Store size={16} /> Market
         </button>
-        <button className={`btn btn-ghost ${currentView === "cart" ? "active" : ""}`} onClick={() => setCurrentView("cart")} style={{ position: "relative" }}>
-          <ShoppingCart size={18} /> Cart
-          {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+
+        <button
+          className={`btn ${currentView === "cart" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setCurrentView("cart")}
+          style={{ position: "relative" }}
+        >
+          <ShoppingCart size={16} /> Cart
+          {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
-        <button className={`btn btn-ghost ${currentView === "list_item" ? "active" : ""}`} onClick={() => setCurrentView("list_item")}>
-          <PlusCircle size={18} /> List Item
+
+        <button
+          className={`btn ${currentView === "list_item" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setCurrentView("list_item")}
+        >
+          <PlusCircle size={16} /> List Item
         </button>
-        <button className={`btn btn-ghost ${currentView === "wallet" ? "active" : ""}`} onClick={() => setCurrentView("wallet")}>
-          <User size={18} /> Account
+
+        <button
+          className={`btn ${currentView === "wallet" ? "btn-primary" : "btn-ghost"}`}
+          onClick={() => setCurrentView("wallet")}
+        >
+          <User size={16} /> Account
+        </button>
+
+        <button
+          onClick={toggleTheme}
+          className="btn btn-ghost"
+          title="Toggle Theme"
+        >
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
       </div>
-    </header>
+    </nav>
   );
 }
 
